@@ -1,0 +1,11 @@
+{
+    "name": "FrAnime CSV Exporter",
+    "namespace": "github.com/cyrilGrandjean",
+    "copyright": "2024",
+    "match": [
+      "https://franime.fr/*"
+    ],
+    "grant": [],
+    "icon": "https://www.google.com/s2/favicons?sz=64&domain=franime.fr",
+    "downloadURL":  "https://github.com/cyrilGrandjean/franime-script/releases/latest/download/franime-script.user.js"
+}
