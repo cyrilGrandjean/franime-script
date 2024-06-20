@@ -1,14 +1,20 @@
-import { Model, Field } from "@d34d/w-orm";
+import {Field, Model} from '@d34d/w-orm';
 
-export class ChapterUrlsModel extends Model {
+export class AnimeModel extends Model {
     @Field({primaryKey: true})
     id: string;
 
     @Field({unique: false})
-    series: string;
+    name: string;
+
+    @Field({unique: false})
+    lang: string;
 
     @Field({unique: false})
     episode: number;
+
+    @Field({unique: false})
+    season: number;
 
     @Field({unique: false})
     reader: string;
@@ -20,10 +26,12 @@ export class ChapterUrlsModel extends Model {
     episodeUrl: string;
 }
 
-export interface ChapterUrls {
+export interface Anime{
     id: string;
-    series: string;
+    name: string;
+    lang: string;
     episode: number;
+    season: number;
     reader: string;
     embedUrl: string;
     episodeUrl: string;

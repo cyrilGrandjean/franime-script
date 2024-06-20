@@ -1,19 +1,31 @@
-import {ChapterUrls} from "../database";
+import {Anime} from '../database';
+
 
 export class Csv {
-    private dataBrut: ChapterUrls[];
+    private dataBrut: Anime[];
     private filename: string;
 
-    constructor(data: ChapterUrls[]) {
+    constructor(data: Anime[]) {
         this.dataBrut = data;
-        this.filename = data[0].series;
+        this.sortData();
+        this.filename = data[0].name;
+    }
+
+    private sortData(){
+        this.dataBrut.sort((a, b) => {
+            if (a.season < b.season) return -1;
+            if (a.season > b.season) return 1;
+            if (a.episode < b.episode) return -1;
+            if (a.episode > b.episode) return 1;
+            return 0;
+        });
     }
 
     private formatData(): { title: string, season: number, episode: number, url: string }[] {
         return this.dataBrut.map((data) => {
             return {
-                title: data.series,
-                season: 1,
+                title: data.name,
+                season: data.season,
                 episode: data.episode,
                 url: data.embedUrl,
             };
