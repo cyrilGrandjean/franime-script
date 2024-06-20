@@ -8,7 +8,7 @@ export async function initSummary(db: CsvExporterDatabase) {
         if (parentDiv) {
             csvButtonObserver.disconnect();
             addButtonDownloadCsv(parentDiv, async () => {
-                let animeList = await db.animeRepository.getAnimeByName(getAnimeName());
+                let animeList = await db.animeRepository.getAnimeByName(getAnimeName(document.location.pathname));
                 let csv = new Csv(animeList);
                 csv.download();
             });

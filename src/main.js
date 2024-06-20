@@ -2,12 +2,12 @@ import {CsvExporterDatabase} from "./database";
 import {getAnimeEpisode, getAnimeName} from "./utils";
 import {initReader, initSummary} from "./init";
 
-async function process(database) {
-    if (getAnimeName() === '/') {
+async function process(database, url) {
+    if (getAnimeName(url.pathname) === '/') {
         return;
     }
 
-    if (getAnimeEpisode(document.location.search)) {
+    if (getAnimeEpisode(url.search)) {
         initReader(database);
     } else {
         await initSummary(database);
@@ -17,17 +17,10 @@ async function process(database) {
 (async () => {
     const database = new CsvExporterDatabase()
     await database.createDatabases();
+    navigation.addEventListener('navigate', async (e) => {
+        let navigate = new URL(e.destination.url)
+        await process(database, navigate);
+    });
 
-    window.onload = () => {
-        let oldHref = document.location.href;
-        const body = document.querySelector("body");
-        const observer = new MutationObserver(async mutations => {
-            if (oldHref !== document.location.href) {
-                oldHref = document.location.href;
-                await process(database);
-            }
-        });
-        observer.observe(body, {childList: true, subtree: true});
-    };
-    await process(database);
+    await process(database, new URL(document.location.href));
 })();

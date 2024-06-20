@@ -3,45 +3,56 @@ import {getAnimeEpisode, getAnimeLang, getAnimeName, getAnimeSeason, observeDom}
 
 export function initReader(db: CsvExporterDatabase): void {
     /// observer for play button.
-    playButtonAction(db);
+    playButtonActions(db);
     /// observer for lecteur button
-    let lecteurButtonObserver = observeDom(document.getElementById('root'), () => {
-        let lecteurButton = document.getElementById('headlessui-listbox-button-:r0:') as HTMLButtonElement;
-        let childLecteurButton = lecteurButton.querySelector("div") as HTMLElement;
-        if (childLecteurButton) {
-            lecteurButtonObserver.disconnect();
-            let test = observeDom(childLecteurButton, (e) => {
-                for (const eElement of e) {
-                }
-            });
-        }
-
-    });
+    // let lecteurButtonObserver = observeDom(document.getElementById('root'), () => {
+    //     let lecteurButton = document.getElementById('headlessui-listbox-button-:r0:') as HTMLButtonElement;
+    //     let childLecteurButton = lecteurButton.querySelector("div") as HTMLElement;
+    //     if (childLecteurButton) {
+    //         lecteurButtonObserver.disconnect();
+    //         let test = observeDom(childLecteurButton, (e) => {
+    //             for (const eElement of e) {
+    //             }
+    //         });
+    //     }
+    //
+    // });
 }
 
-function playButtonAction(db: CsvExporterDatabase) {
-    let playButtonObserver = observeDom(document.getElementById('root'), () => {
-        let playButton = document.getElementById('play_button') as HTMLButtonElement;
+function playButtonActions(db: CsvExporterDatabase) {
+    let playButton = document.getElementById('play_button') as HTMLButtonElement;
+    if (playButton) {
+        playButton.click();
+        iframeAction(db);
+        return;
+    }
+
+    let observer = observeDom(document.getElementById('root'), () => {
+        playButton = document.getElementById('play_button') as HTMLButtonElement;
         if (playButton) {
-            playButtonObserver.disconnect();
+            observer.disconnect();
             playButton.click();
-            let iframeObserver = observeDom(document.getElementById('root'), async () => {
-                let iframe = document.querySelector('iframe');
-                if (iframe.title) {
-                    iframeObserver.disconnect();
-                    await saveAnime(db, iframe.src);
-                }
-            });
+            iframeAction(db);
         }
     });
 }
 
-async function saveAnime(db: CsvExporterDatabase, embed_url: string){
+function iframeAction(db: CsvExporterDatabase) {
+    let iframeObserver = observeDom(document.getElementById('root'), async () => {
+        let iframe = document.querySelector('iframe');
+        if (iframe.title) {
+            iframeObserver.disconnect();
+            await saveAnime(db, iframe.src);
+        }
+    });
+}
+
+async function saveAnime(db: CsvExporterDatabase, embed_url: string) {
     const location = document.location;
     const locationPathname = location.pathname;
     const locationSearch = location.search;
     let anime: Anime = {
-        name: getAnimeName(),
+        name: getAnimeName(locationPathname),
         lang: getAnimeLang(locationSearch),
         season: getAnimeSeason(locationSearch),
         episode: getAnimeEpisode(locationSearch),
@@ -50,7 +61,7 @@ async function saveAnime(db: CsvExporterDatabase, embed_url: string){
         id: null,
         reader: (new URL(embed_url)).hostname
     }
-    if (!await db.animeRepository.isDataInDB(anime)){
+    if (!await db.animeRepository.isDataInDB(anime)) {
         await db.animeRepository.insertAnime(anime);
     }
 }

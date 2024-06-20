@@ -22,11 +22,14 @@ export function observeDom(obj: HTMLElement, callback) {
 }
 
 export function addButtonDownloadCsv(parentDiv: HTMLElement, callDownload: () => void) {
-    ;
+    if (document.getElementById('csvButton')) {
+        return;
+    }
     let div = el(
         'div',
         'CSV',
         {
+            id: 'csvButton',
             class: 'ml-3 flex justify-center items-center w-[39px] h-[39px] relative gap-2.5 p-2.5 rounded-[10px] bg-[#1e222c]',
             style: 'cursor: pointer;',
         });

@@ -1,5 +1,5 @@
-export function getAnimeName(){
-    return document.location.pathname.replace('/anime/', '');
+export function getAnimeName(pathname: string){
+    return pathname.replace('/anime/', '');
 }
 
 export function getAnimeLang(queryParams: string) {
