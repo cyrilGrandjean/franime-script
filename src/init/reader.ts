@@ -5,18 +5,33 @@ export function initReader(db: CsvExporterDatabase): void {
     /// observer for play button.
     playButtonActions(db);
     /// observer for lecteur button
-    // let lecteurButtonObserver = observeDom(document.getElementById('root'), () => {
-    //     let lecteurButton = document.getElementById('headlessui-listbox-button-:r0:') as HTMLButtonElement;
-    //     let childLecteurButton = lecteurButton.querySelector("div") as HTMLElement;
-    //     if (childLecteurButton) {
-    //         lecteurButtonObserver.disconnect();
-    //         let test = observeDom(childLecteurButton, (e) => {
-    //             for (const eElement of e) {
-    //             }
-    //         });
-    //     }
-    //
-    // });
+    choiceLecteurAction(db);
+}
+
+function choiceLecteurAction(db: CsvExporterDatabase) {
+    let lecteurButton = document.getElementById('headlessui-listbox-button-:r0:') as HTMLButtonElement;
+    if (lecteurButton) {
+        return;
+    }
+
+    let lecteurButtonObserver = observeDom(document.getElementById('root'), () => {
+        let lecteurButton = document.getElementById('headlessui-listbox-button-:r0:') as HTMLButtonElement;
+        if (lecteurButton) {
+            lecteurButtonObserver.disconnect();
+            listLecteurAction(lecteurButton.parentNode as HTMLElement, db);
+        }
+    });
+}
+
+function listLecteurAction(parentUlNode: HTMLElement, db: CsvExporterDatabase) {
+    let divObserver = observeDom(parentUlNode, (e) => {
+        for (const eElement of e) {
+            for (const removedNode of eElement.removedNodes) {
+                if (removedNode.nodeName !== 'UL') continue;
+                playButtonActions(db);
+            }
+        }
+    })
 }
 
 function playButtonActions(db: CsvExporterDatabase) {
@@ -63,5 +78,12 @@ async function saveAnime(db: CsvExporterDatabase, embed_url: string) {
     }
     if (!await db.animeRepository.isDataInDB(anime)) {
         await db.animeRepository.insertAnime(anime);
+    } else {
+        let animeDb = await db.animeRepository.getAnime(anime.name, anime.lang, anime.season, anime.episode);
+        if (animeDb.embedUrl === anime.embedUrl) return;
+        let confirme = window.confirm('Etes vous sur de vouloir changer d\'url');
+        if (confirme) {
+            await db.animeRepository.updateEmbedUrl(anime);
+        }
     }
 }
